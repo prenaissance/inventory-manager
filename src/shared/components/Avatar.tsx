@@ -6,7 +6,7 @@ export type AvatarProps = Omit<IconButtonProps, "aria-label"> & {
 
 export const Avatar = ({ imageUrl, ...props }: AvatarProps) => (
   <IconButton
-    borderBlock={2}
+    borderWidth={2}
     borderRadius={0}
     borderColor="blue.400"
     _hover={{ borderColor: "blue.400" }}
