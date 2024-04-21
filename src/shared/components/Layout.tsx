@@ -12,8 +12,6 @@ export const Layout = ({ children }: PropsWithChildren) => (
     bgColor="blue.800"
   >
     <NavBar />
-    <Box flex={1} p={4}>
-      {children}
-    </Box>
+    <Box flex={1}>{children}</Box>
   </Flex>
 );

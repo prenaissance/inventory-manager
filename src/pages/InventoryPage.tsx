@@ -1,9 +1,13 @@
+import { UserHeader } from "@/features/inventory/UserHeader";
 import { Layout } from "@/shared/components/Layout";
+import { Box } from "@chakra-ui/react";
 
 export const InventoryPage = () => {
   return (
     <Layout>
-      <h1>Inventory</h1>
+      <Box justifySelf="center" m={0} p={0}>
+        <UserHeader />
+      </Box>
     </Layout>
   );
 };
