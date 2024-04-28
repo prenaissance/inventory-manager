@@ -15,6 +15,7 @@ export const InventorySearchBar = (props: InputProps) => {
 
   return (
     <Input
+      type="search"
       placeholder="Start typing to filter items"
       defaultValue={search ?? ""}
       onChange={handleChange}
