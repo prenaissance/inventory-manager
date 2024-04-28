@@ -1,8 +1,8 @@
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 
 const subscribeToKey = (key: string) => (callback: () => void) => {
   const listener = (e: StorageEvent) => {
-    if (e.key === key && e.storageArea === localStorage) {
+    if (e.key === key) {
       callback();
     }
   };
@@ -10,13 +10,28 @@ const subscribeToKey = (key: string) => (callback: () => void) => {
   return () => window.removeEventListener("storage", listener);
 };
 
-const getSnapshot = <T>(key: string, defaultValue: T) =>
-  JSON.parse(localStorage.getItem(key) ?? "null") ?? defaultValue;
+export const useLocalStorage = <T>(
+  key: string,
+  defaultValue: T,
+): [T, (value: T) => void] => {
+  const [value, setValue] = useState<T>(() => {
+    const storedValue = localStorage.getItem(key);
+    return storedValue ? JSON.parse(storedValue) : defaultValue;
+  });
 
-export const useLocalStorage = <T>(key: string, defaultValue: T) =>
-  [
-    useSyncExternalStore<T>(subscribeToKey(key), () =>
-      getSnapshot<T>(key, defaultValue),
-    ),
-    (value: T) => localStorage.setItem(key, JSON.stringify(value)),
-  ] as const;
+  useEffect(() => {
+    const unsubscribe = subscribeToKey(key)(() => {
+      const storedValue = localStorage.getItem(key);
+      setValue(storedValue ? JSON.parse(storedValue) : defaultValue);
+    });
+
+    return unsubscribe;
+  }, [key, defaultValue]);
+
+  const setStoredValue = (newValue: T) => {
+    setValue(newValue);
+    localStorage.setItem(key, JSON.stringify(newValue));
+  };
+
+  return [value, setStoredValue];
+};

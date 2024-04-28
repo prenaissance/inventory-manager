@@ -10,22 +10,77 @@ import {
 
 import parodyLogo from "@/assets/parody-logo.png";
 import { InventorySearchBar } from "./InventorySearchBar";
+import { useItems } from "@/entities/item/api";
+import { DragEvent, useState } from "react";
+import { ItemSlot } from "@/entities/item/ui/ItemSlot";
+import { EmptyItemSlot } from "@/entities/item/ui/EmptyItemSlot";
+import { Item } from "@/entities/item/model/item";
 
 export type InventoryProps = BoxProps;
+const ITEMS_PER_PAGE = 25;
 
 export const Inventory = (props: InventoryProps) => {
+  const [page, setPage] = useState(0);
+  const { items, setItems } = useItems();
+  const minOrder = 0 + page * ITEMS_PER_PAGE;
+  const maxOrder = 24 + page * ITEMS_PER_PAGE;
+
+  const itemsOnPage = items.filter(
+    (item) => item.order >= minOrder && item.order <= maxOrder,
+  );
+  const orderedItems = new Array(ITEMS_PER_PAGE).fill(null).map((_, index) => {
+    const order = index + minOrder;
+    return itemsOnPage.find((item) => item.order === order);
+  });
+  const getDragStartHandler =
+    (item: Item) => (e: DragEvent<HTMLDivElement>) => {
+      e.dataTransfer.setData("item", JSON.stringify(item));
+      e.dataTransfer.effectAllowed = "move";
+    };
+
+  const getDropHandler = (order: number) => (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const item = JSON.parse(e.dataTransfer.getData("item")) as Item;
+    if (item.order === order) {
+      return;
+    }
+    const itemToSwap = items.find((i) => i.order === order);
+    if (itemToSwap) {
+      setItems(
+        items.map((x) => {
+          if (x.id === item.id) {
+            return { ...x, order: itemToSwap.order };
+          }
+          if (x.id === itemToSwap.id) {
+            return { ...x, order };
+          }
+          return x;
+        }),
+      );
+    } else {
+      setItems(
+        items.map((x) => {
+          if (x.id === item.id) {
+            return { ...x, order };
+          }
+          return x;
+        }),
+      );
+    }
+  };
+
   return (
     <Box
       maxW="56rem"
       mx="auto"
-      bgColor="gray.800"
+      bgColor="#1c1f21"
       p={2}
       mt={8}
       border="1px solid"
       borderColor="gray.600"
       {...props}
     >
-      <Heading as="h1" size="lg" mb={4}>
+      <Heading color="white" as="h1" size="lg" mb={4}>
         <Image
           src={parodyLogo}
           alt="logo"
@@ -45,7 +100,31 @@ export const Inventory = (props: InventoryProps) => {
         }}
         gap={4}
         my={2}
-      ></Grid>
+      >
+        <Grid
+          bgColor="black"
+          p={1}
+          templateColumns="repeat(5, 1fr)"
+          gap={1}
+          border="1px solid"
+          borderColor="gray.600"
+        >
+          {orderedItems.map((item, index) =>
+            item ? (
+              <ItemSlot
+                key={item.id}
+                item={item}
+                onDragStart={getDragStartHandler(item)}
+              />
+            ) : (
+              <EmptyItemSlot
+                key={Math.random()}
+                onDrop={getDropHandler(minOrder + index)}
+              />
+            ),
+          )}
+        </Grid>
+      </Grid>
     </Box>
   );
 };
