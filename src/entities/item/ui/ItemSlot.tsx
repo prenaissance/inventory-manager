@@ -7,16 +7,26 @@ import { RARITY_COLORS } from "../model/rarity";
 export type ItemSlotProps = {
   item: Item;
   onDragStart?: DragEventHandler<HTMLDivElement>;
+  onSelected?: () => void;
+  selected?: boolean;
 };
 
-export const ItemSlot = ({ item, onDragStart }: ItemSlotProps) => {
+export const ItemSlot = ({
+  item,
+  onDragStart,
+  onSelected,
+  selected,
+}: ItemSlotProps) => {
   return (
     <Box
+      tabIndex={0}
       onDragStart={onDragStart}
       onDragOver={(e) => {
         e.preventDefault();
         e.dataTransfer.dropEffect = "move";
       }}
+      onClick={onSelected}
+      onFocus={onSelected}
       draggable
       aspectRatio={1}
       w="full"
@@ -33,7 +43,7 @@ export const ItemSlot = ({ item, onDragStart }: ItemSlotProps) => {
         borderColor: RARITY_COLORS[item.template.rarity],
       }}
       aria-label={item.template.name}
-      bgColor="rgb(60, 53, 46)"
+      bgColor={selected ? "gray.600" : "rgb(60, 53, 46)"}
     >
       <Image
         objectFit="contain"

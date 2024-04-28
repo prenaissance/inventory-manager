@@ -15,6 +15,7 @@ import { DragEvent, useState } from "react";
 import { ItemSlot } from "@/entities/item/ui/ItemSlot";
 import { EmptyItemSlot } from "@/entities/item/ui/EmptyItemSlot";
 import { Item } from "@/entities/item/model/item";
+import { ItemPreview } from "@/entities/item/ui/ItemPreview";
 
 export type InventoryProps = BoxProps;
 const ITEMS_PER_PAGE = 25;
@@ -22,6 +23,7 @@ const ITEMS_PER_PAGE = 25;
 export const Inventory = (props: InventoryProps) => {
   const [page, setPage] = useState(0);
   const { items, setItems } = useItems();
+  const [selectedItem, setSelectedItem] = useState<Item | undefined>(items[0]);
   const minOrder = 0 + page * ITEMS_PER_PAGE;
   const maxOrder = 24 + page * ITEMS_PER_PAGE;
 
@@ -32,6 +34,8 @@ export const Inventory = (props: InventoryProps) => {
     const order = index + minOrder;
     return itemsOnPage.find((item) => item.order === order);
   });
+  const getSelectedHandler = (item: Item) => () => setSelectedItem(item);
+
   const getDragStartHandler =
     (item: Item) => (e: DragEvent<HTMLDivElement>) => {
       e.dataTransfer.setData("item", JSON.stringify(item));
@@ -115,6 +119,8 @@ export const Inventory = (props: InventoryProps) => {
                 key={item.id}
                 item={item}
                 onDragStart={getDragStartHandler(item)}
+                selected={selectedItem?.id === item.id}
+                onSelected={getSelectedHandler(item)}
               />
             ) : (
               <EmptyItemSlot
@@ -124,6 +130,7 @@ export const Inventory = (props: InventoryProps) => {
             ),
           )}
         </Grid>
+        {selectedItem ? <ItemPreview item={selectedItem} /> : null}
       </Grid>
     </Box>
   );
