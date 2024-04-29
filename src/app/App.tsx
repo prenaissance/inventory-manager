@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 export const App = () => (
   <ChakraProvider>
-    <BrowserRouter>
+    <BrowserRouter basename="inventory-manager">
       <Routes>
         <Route path="" element={<InventoryPage />} />
       </Routes>
