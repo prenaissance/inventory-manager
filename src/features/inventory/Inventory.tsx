@@ -17,12 +17,18 @@ import { EmptyItemSlot } from "@/entities/item/ui/EmptyItemSlot";
 import { Item } from "@/entities/item/model/item";
 import { ItemPreview } from "@/entities/item/ui/ItemPreview";
 import { AddItemFormButton } from "./AddItemFormButton";
+import { InventoryPagination } from "./InventoryPagination";
+import { useSearchParams } from "react-router-dom";
+import { DragOverPagination } from "./DragOverPagination";
 
 export type InventoryProps = BoxProps;
 const ITEMS_PER_PAGE = 25;
 
 export const Inventory = (props: InventoryProps) => {
-  const [page, setPage] = useState(0);
+  const [searchParams] = useSearchParams({
+    page: "1",
+  });
+  const page = Number(searchParams.get("page")) - 1;
   const { items, setItems } = useItems();
   const [selectedItem, setSelectedItem] = useState<Item | undefined>(items[0]);
   const minOrder = 0 + page * ITEMS_PER_PAGE;
@@ -85,6 +91,7 @@ export const Inventory = (props: InventoryProps) => {
       borderColor="gray.600"
       {...props}
     >
+      <InventoryPagination />
       <HStack>
         <Heading color="white" as="h1" size="lg" mb={4}>
           <Image
@@ -118,7 +125,24 @@ export const Inventory = (props: InventoryProps) => {
           gap={1}
           border="1px solid"
           borderColor="gray.600"
+          position="relative"
         >
+          <DragOverPagination
+            direction="backward"
+            position="absolute"
+            top="0"
+            left="0"
+            h="full"
+            w="10%"
+          />
+          <DragOverPagination
+            direction="forward"
+            position="absolute"
+            top="0"
+            right="0"
+            h="full"
+            w="10%"
+          />
           {orderedItems.map((item, index) =>
             item ? (
               <ItemSlot
@@ -138,6 +162,7 @@ export const Inventory = (props: InventoryProps) => {
         </Grid>
         {selectedItem ? <ItemPreview item={selectedItem} /> : null}
       </Grid>
+      <InventoryPagination />
     </Box>
   );
 };
