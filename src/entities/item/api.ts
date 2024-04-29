@@ -5,7 +5,8 @@ import mannCoSupplyCrateKeyUrl from "@/assets/mann-co-supply-crate-key.png";
 import tf2LogoUrl from "@/assets/tf2-logo.jpg";
 import tourOfDutyTicketUrl from "@/assets/tour-of-duty-ticket.png";
 import { Item } from "./model/item";
-import { useLocalStorage } from "@/shared/hooks/use-local-storage";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export const defaultItemTemplates: ItemTemplate[] = [
   {
@@ -52,23 +53,32 @@ export const defaultItems: Item[] = [
   },
 ];
 
-export const useItemTemplates = () => {
-  const [itemTemplates, setItemTemplates] = useLocalStorage<ItemTemplate[]>(
-    "itemTemplates",
-    defaultItemTemplates,
-  );
+type ItemTemplatesStore = {
+  itemTemplates: ItemTemplate[];
+  setItemTemplates: (itemTemplates: ItemTemplate[]) => void;
+};
+export const useItemTemplates = create<ItemTemplatesStore>()(
+  persist(
+    (set) => ({
+      itemTemplates: defaultItemTemplates,
+      setItemTemplates: (itemTemplates: ItemTemplate[]) =>
+        set({ itemTemplates }),
+    }),
+    { name: "item-templates" },
+  ),
+);
 
-  return {
-    itemTemplates,
-    setItemTemplates,
-  };
+type ItemsStore = {
+  items: Item[];
+  setItems: (items: Item[]) => void;
 };
 
-export const useItems = () => {
-  const [items, setItems] = useLocalStorage<Item[]>("items", defaultItems);
-
-  return {
-    items,
-    setItems,
-  };
-};
+export const useItems = create<ItemsStore>()(
+  persist(
+    (set) => ({
+      items: defaultItems,
+      setItems: (items: Item[]) => set({ items }),
+    }),
+    { name: "items" },
+  ),
+);

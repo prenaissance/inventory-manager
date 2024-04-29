@@ -16,6 +16,7 @@ import { ItemSlot } from "@/entities/item/ui/ItemSlot";
 import { EmptyItemSlot } from "@/entities/item/ui/EmptyItemSlot";
 import { Item } from "@/entities/item/model/item";
 import { ItemPreview } from "@/entities/item/ui/ItemPreview";
+import { AddItemFormButton } from "./AddItemFormButton";
 
 export type InventoryProps = BoxProps;
 const ITEMS_PER_PAGE = 25;
@@ -84,15 +85,20 @@ export const Inventory = (props: InventoryProps) => {
       borderColor="gray.600"
       {...props}
     >
-      <Heading color="white" as="h1" size="lg" mb={4}>
-        <Image
-          src={parodyLogo}
-          alt="logo"
-          boxSize="50px"
-          display="inline-block"
-        />
-        Inventory
-      </Heading>
+      <HStack>
+        <Heading color="white" as="h1" size="lg" mb={4}>
+          <Image
+            src={parodyLogo}
+            alt="logo"
+            boxSize="50px"
+            display="inline-block"
+          />
+          Inventory
+        </Heading>
+        <HStack ml="auto" spacing={4}>
+          <AddItemFormButton />
+        </HStack>
+      </HStack>
       <HStack gap={2}>
         <Text color="gray.300">Looking for a specific item?</Text>
         <InventorySearchBar />
