@@ -8,6 +8,7 @@ import fastifySwaggerUi from "@fastify/swagger-ui";
 import autoLoadPlugin from "@fastify/autoload";
 import corsPlugin from "@fastify/cors";
 import jwtPlugin from "@fastify/jwt";
+import mongodbPlugin from "@fastify/mongodb";
 
 config();
 
@@ -24,7 +25,13 @@ app.register(corsPlugin, {
 });
 
 app.register(jwtPlugin, {
-  secret: process.env.JWT_SECRET!,
+  secret: process.env.JWT_SECRET,
+});
+
+app.register(mongodbPlugin, {
+  url: process.env.MONGODB_URI,
+  database: "inventory-manager",
+  forceClose: true,
 });
 
 await app.register(fastifySwagger, {
@@ -34,6 +41,18 @@ await app.register(fastifySwagger, {
       description: "Backend API for Inventory Manager",
       version: "0.1.0",
     },
+  },
+  openapi: {
+    components: {
+      securitySchemes: {
+        jwt: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [{ jwt: [] }],
   },
 });
 
