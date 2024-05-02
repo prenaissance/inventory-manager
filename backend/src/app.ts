@@ -9,6 +9,7 @@ import autoLoadPlugin from "@fastify/autoload";
 import corsPlugin from "@fastify/cors";
 import jwtPlugin from "@fastify/jwt";
 import mongodbPlugin from "@fastify/mongodb";
+import authPlugin from "@fastify/auth";
 
 config();
 
@@ -34,6 +35,8 @@ app.register(mongodbPlugin, {
   forceClose: true,
 });
 
+app.register(authPlugin);
+
 await app.register(fastifySwagger, {
   swagger: {
     info: {
@@ -57,12 +60,31 @@ await app.register(fastifySwagger, {
 });
 
 app.register(autoLoadPlugin, {
+  dir: path.join(__dirname, "plugins"),
+});
+
+app.register(autoLoadPlugin, {
   dir: path.join(__dirname, "routes"),
   options: { prefix: "/api" },
 });
 
 app.register(fastifySwaggerUi, {
   routePrefix: "/swagger",
+});
+
+// graceful shutdown
+const listeners = ["SIGINT", "SIGTERM"] as const;
+listeners.forEach((signal) => {
+  process.on(signal, async () => {
+    await app.close();
+    process.exit(0);
+  });
+});
+
+app.after(() => {
+  app.get("/shallow-ping", async () => {
+    return "pong";
+  });
 });
 
 app
@@ -77,4 +99,5 @@ app
   });
 
 await app.ready();
+
 app.swagger();

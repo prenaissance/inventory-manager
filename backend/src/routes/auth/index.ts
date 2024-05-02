@@ -1,16 +1,24 @@
 import { Type } from "@sinclair/typebox";
 import { FastifyPluginAsyncTypebox } from "@fastify/type-provider-typebox";
-import { Item, ITEMS_COLLECTION } from "@/entities/item";
 import { ObjectId } from "@fastify/mongodb";
+
+import { Item, ITEMS_COLLECTION } from "@/entities/item";
 import { User, USERS_COLLECTION } from "@/entities/user";
+import { Permission } from "@shared/enums/permission";
 
 const RequestSchema = Type.Object({
   userId: Type.String({ format: "uuid" }),
+  permissions: Type.Array(Type.Enum(Permission)),
 });
 
 const ResponseSchema = Type.Object({
   token: Type.String({ description: "JWT token" }),
 });
+
+export type JwtData = {
+  sub: string;
+  permissions: readonly Permission[];
+};
 
 const defaultItems: Omit<Item, "_id" | "userId">[] = [
   {
@@ -39,9 +47,10 @@ const authRoutes: FastifyPluginAsyncTypebox = async (app) => {
       },
     },
     async (request) => {
-      const { userId } = request.body;
+      const { userId, permissions } = request.body;
       const token = app.jwt.sign({
         sub: userId,
+        permissions,
       });
 
       const users = app.mongo.db!.collection<User>(USERS_COLLECTION);

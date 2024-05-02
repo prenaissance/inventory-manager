@@ -1,5 +1,6 @@
 import { ObjectId } from "@fastify/mongodb";
 import { Rarity } from "@shared/enums/rarity";
+import { Type } from "@sinclair/typebox";
 
 export const ITEM_TEMPLATES_COLLECTION = "item-templates";
 
@@ -14,3 +15,15 @@ export type ItemTemplate = {
   imageUrl: string;
   description: string;
 };
+
+export const ItemTemplateSchema = Type.Object({
+  _id: Type.String(),
+  name: Type.String(),
+  game: Type.Object({
+    name: Type.String(),
+    logoUrl: Type.String(),
+  }),
+  rarity: Type.Enum(Rarity),
+  imageUrl: Type.String(),
+  description: Type.String(),
+});
