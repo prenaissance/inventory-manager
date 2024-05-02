@@ -13,11 +13,11 @@ const GetItemsRequestSchema = Type.Object({
 });
 
 const inventoryRoutes: FastifyPluginAsyncTypebox = async (app) => {
-  app.post(
+  app.get(
     "/",
     {
       schema: {
-        body: GetItemsRequestSchema,
+        querystring: GetItemsRequestSchema,
         response: {
           200: Type.Array(Type.Any()),
         },
@@ -26,7 +26,7 @@ const inventoryRoutes: FastifyPluginAsyncTypebox = async (app) => {
     },
     async (request) => {
       const userId = request.identity.sub;
-      const { page } = request.body as Static<typeof GetItemsRequestSchema>;
+      const { page } = request.query as Static<typeof GetItemsRequestSchema>;
       const itemsCollection = app.mongo.db!.collection<Item>(ITEMS_COLLECTION);
       const items = await itemsCollection
         .aggregate<PopulatedItem>([

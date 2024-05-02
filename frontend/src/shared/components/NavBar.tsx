@@ -1,6 +1,7 @@
 import { Stack, Image, Flex, Link, useTheme, Text } from "@chakra-ui/react";
 import logoUrl from "@/assets/parody-logo.png";
 import { Link as ReactRouterLink } from "react-router-dom";
+import { LoginActions } from "@/features/auth/LoginActions";
 
 export const NavBar = () => {
   const theme = useTheme();
@@ -34,6 +35,7 @@ export const NavBar = () => {
           </Text>
         </Link>
       </Stack>
+      <LoginActions alignSelf="right" />
     </Flex>
   );
 };
