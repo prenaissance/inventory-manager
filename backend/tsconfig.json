@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "include": ["src", "types.d.ts", "scripts"],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["../shared/*"],
+      "@/*": ["src/*"]
+    },
+    "module": "ESNext"
+  }
+}

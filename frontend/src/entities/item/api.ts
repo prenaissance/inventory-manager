@@ -1,5 +1,4 @@
 import { ItemTemplate } from "./model/item-template";
-import { Rarity } from "./model/rarity";
 
 import mannCoSupplyCrateKeyUrl from "@/assets/mann-co-supply-crate-key.png";
 import tf2LogoUrl from "@/assets/tf2-logo.jpg";
@@ -7,6 +6,7 @@ import tourOfDutyTicketUrl from "@/assets/tour-of-duty-ticket.png";
 import { Item } from "./model/item";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { Rarity } from "@shared/enums/rarity";
 
 export const defaultItemTemplates: ItemTemplate[] = [
   {

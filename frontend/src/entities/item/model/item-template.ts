@@ -1,4 +1,4 @@
-import { Rarity } from "./rarity";
+import { Rarity } from "@shared/enums/rarity";
 
 export type ItemTemplate = {
   id: string;

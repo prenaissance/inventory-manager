@@ -1,11 +1,13 @@
 {
   "name": "@inventory-manager/backend",
   "version": "1.0.0",
+  "private": true,
   "description": "",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx app.ts | pino-pretty"
+    "dev": "tsx src/app.ts --watch | pino-pretty",
+    "seed": "tsx scripts/seed.ts"
   },
   "keywords": [],
   "author": "",

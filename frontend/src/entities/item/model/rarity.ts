@@ -1,10 +1,4 @@
-export enum Rarity {
-  COMMON = "common",
-  UNCOMMON = "uncommon",
-  RARE = "rare",
-  EPIC = "epic",
-  LEGENDARY = "legendary",
-}
+import { Rarity } from "@shared/enums/rarity";
 
 export const RARITY_COLORS = {
   [Rarity.COMMON]: "#b0b0b0",
