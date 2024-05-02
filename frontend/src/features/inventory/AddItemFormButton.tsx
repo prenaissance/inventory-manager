@@ -19,11 +19,12 @@ import {
 } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { useRef } from "react";
-import { useItems, useItemTemplates } from "@/entities/item/api";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Item } from "@/entities/item/model/item";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { addItem, fetchItemTemplates } from "@/entities/item/api";
 
 const schema = z.object({
   templateId: z.string().min(1, {
@@ -34,42 +35,52 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-const getMinAvailableOrder = (items: Item[]) => {
-  const bitMap = new Array(items.length + 1).fill(false);
-  for (const item of items) {
-    bitMap[item.order] = true;
-  }
-  return bitMap.indexOf(false);
-};
-
 const LABEL = "Add item to inventory";
 
 export const AddItemFormButton = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = useRef<HTMLButtonElement>(null);
-  const { items, setItems } = useItems();
-  const itemTemplates = useItemTemplates((state) => state.itemTemplates);
+  const queryClient = useQueryClient();
+  const { data } = useQuery({
+    queryKey: ["itemTemplates"],
+    queryFn: fetchItemTemplates,
+  });
   const toast = useToast();
+  const addItemMutation = useMutation({
+    mutationFn: addItem,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["items"],
+      });
+
+      onClose();
+    },
+    onError: (error) => {
+      toast({
+        title: "Error adding item",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    },
+  });
+  const itemTemplates = data ?? [];
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = useForm<FormValues>({ resolver: zodResolver(schema), mode: "onChange" });
-  const onSubmit = (data: FormValues) => {
-    const id = crypto.randomUUID();
+  const onSubmit = async (data: FormValues) => {
     const itemTemplate = itemTemplates.find(
-      (template) => template.id === data.templateId,
+      (template) => template._id === data.templateId,
     );
     if (!itemTemplate) {
       return;
     }
-    const order = getMinAvailableOrder(items);
-    const newItem: Item = {
-      id,
-      template: itemTemplate,
-      order,
-    };
-    setItems([...items, newItem]);
+
+    await addItemMutation.mutateAsync(data);
+
     toast({
       title: "Item added",
       description: `Item ${itemTemplate.name} added to inventory`,
@@ -77,7 +88,6 @@ export const AddItemFormButton = () => {
       duration: 5000,
       isClosable: true,
     });
-    onClose();
   };
 
   return (
@@ -103,7 +113,7 @@ export const AddItemFormButton = () => {
                 <FormLabel>Item</FormLabel>
                 <Select {...register("templateId")}>
                   {itemTemplates.map((template) => (
-                    <option key={template.id} value={template.id}>
+                    <option key={template._id} value={template._id}>
                       {template.name}
                     </option>
                   ))}
@@ -117,7 +127,12 @@ export const AddItemFormButton = () => {
               <Button colorScheme="gray" ref={cancelRef} onClick={onClose}>
                 Cancel
               </Button>
-              <Button colorScheme="gray" type="submit" ml={3}>
+              <Button
+                isLoading={addItemMutation.isPending}
+                colorScheme="gray"
+                type="submit"
+                ml={3}
+              >
                 Add Item
               </Button>
             </AlertDialogFooter>

@@ -134,10 +134,10 @@ export const Inventory = (props: InventoryProps) => {
             : orderedItems.map((item, index) =>
                 item ? (
                   <ItemSlot
-                    key={item.id}
+                    key={item._id}
                     item={item}
                     onDragStart={getDragStartHandler(item)}
-                    selected={selectedItem?.id === item.id}
+                    selected={selectedItem?._id === item._id}
                     onSelected={getSelectedHandler(item)}
                   />
                 ) : (

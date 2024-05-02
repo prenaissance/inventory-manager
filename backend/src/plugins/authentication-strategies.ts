@@ -1,7 +1,8 @@
 import { fastifyPlugin } from "fastify-plugin";
-import type { Permission } from "@shared/enums/permission";
 import type { FastifyAuthFunction } from "@fastify/auth";
-import { JwtData } from "@/routes/auth";
+
+import type { Permission } from "@shared/enums/permission";
+import type { JwtData } from "@shared/types/auth";
 
 declare module "fastify" {
   interface FastifyInstance {

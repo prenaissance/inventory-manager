@@ -1,7 +1,7 @@
 import { Rarity } from "@shared/enums/rarity";
 
 export type ItemTemplate = {
-  id: string;
+  _id: string;
   name: string;
   game: {
     name: string;

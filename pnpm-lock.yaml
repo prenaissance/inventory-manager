@@ -148,9 +148,6 @@ importers:
         specifier: ^4.5.2
         version: 4.5.2(@types/react@18.2.79)(react@18.2.0)
     devDependencies:
-      '@backend':
-        specifier: file:../backend/src
-        version: file:backend/src
       '@types/node':
         specifier: ^20.12.7
         version: 20.12.7
@@ -5831,8 +5828,3 @@ packages:
       react: 18.2.0
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
-
-  file:backend/src:
-    resolution: {directory: backend/src, type: directory}
-    name: src
-    dev: true

@@ -15,11 +15,6 @@ const ResponseSchema = Type.Object({
   token: Type.String({ description: "JWT token" }),
 });
 
-export type JwtData = {
-  sub: string;
-  permissions: readonly Permission[];
-};
-
 const defaultItems: Omit<Item, "_id" | "userId">[] = [
   {
     templateId: ObjectId.createFromTime(1),
@@ -66,7 +61,6 @@ const authRoutes: FastifyPluginAsyncTypebox = async (app) => {
         await app.mongo.db!.collection<Item>(ITEMS_COLLECTION).insertMany(
           defaultItems.map((item) => ({
             ...item,
-            _id: new ObjectId(),
             userId,
           })),
         );

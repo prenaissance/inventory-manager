@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { JwtData } from "@backend/routes/auth";
+import type { JwtData } from "@shared/types/auth";
 import { persist } from "zustand/middleware";
 
 type AuthState =
@@ -28,7 +28,6 @@ export const useAuth = create<AuthStore>()(
       jwtData: null,
       token: null,
       login: (jwt: string) => {
-        console.log(jwt);
         const jwtData = JSON.parse(atob(jwt.split(".")[1])) as JwtData;
         set({
           isAuthenticated: true,
