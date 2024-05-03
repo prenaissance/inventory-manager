@@ -89,7 +89,7 @@ app.after(() => {
 
 app
   .listen({
-    port: Number(process.env.PORT) ?? 8080,
+    port: process.env.PORT ? Number(process.env.PORT) : 8080,
   })
   .then(() => {
     const address = app.server.address();
