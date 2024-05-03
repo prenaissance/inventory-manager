@@ -21,7 +21,7 @@ const authenticationStrategies = fastifyPlugin(async (app) => {
         message: "Unauthorized",
       });
     }
-    const data = app.jwt.decode<JwtData>(
+    const data = app.jwt.verify<JwtData>(
       request.headers.authorization.replace("Bearer ", ""),
     );
     if (!data) {
@@ -45,7 +45,7 @@ const authenticationStrategies = fastifyPlugin(async (app) => {
           message: "Unauthorized",
         });
       }
-      const data = app.jwt.decode<JwtData>(
+      const data = app.jwt.verify<JwtData>(
         request.headers.authorization.replace("Bearer ", ""),
       );
       if (!data) {
