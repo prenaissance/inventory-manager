@@ -17,6 +17,13 @@ const AddItemRequestSchema = Type.Object({
   templateId: Type.String(),
 });
 
+const SwapItemsRequestSchema = Type.Object({
+  fromOrder: Type.Integer({ minimum: 0 }),
+  toOrder: Type.Integer({
+    minimum: 0,
+  }),
+});
+
 const inventoryRoutes: FastifyPluginAsyncTypebox = async (app) => {
   app.get(
     "/",
@@ -99,6 +106,53 @@ const inventoryRoutes: FastifyPluginAsyncTypebox = async (app) => {
         templateId: new ObjectId(templateId),
         order,
       });
+    },
+  );
+
+  app.put(
+    "/swap",
+    {
+      schema: {
+        body: SwapItemsRequestSchema,
+        response: {
+          200: Type.Object({}),
+          404: Type.Object({
+            message: Type.String(),
+          }),
+        },
+      },
+      preHandler: app.auth([app.verifyPermissions([Permission.Write])]),
+    },
+    async (request) => {
+      const userId = request.identity.sub;
+      const { fromOrder, toOrder } = request.body as Static<
+        typeof SwapItemsRequestSchema
+      >;
+      const itemsCollection = app.mongo.db!.collection<Item>(ITEMS_COLLECTION);
+      const fromItem = await itemsCollection.findOne({
+        userId,
+        order: fromOrder,
+      });
+      const toItem = await itemsCollection.findOne({ userId, order: toOrder });
+
+      await itemsCollection.bulkWrite([
+        {
+          updateOne: {
+            filter: { _id: fromItem?._id },
+            update: { $set: { order: toOrder } },
+          },
+        },
+        {
+          updateOne: {
+            filter: { _id: toItem?._id },
+            update: { $set: { order: fromOrder } },
+          },
+        },
+      ]);
+
+      return {
+        message: "Items swapped",
+      };
     },
   );
 };

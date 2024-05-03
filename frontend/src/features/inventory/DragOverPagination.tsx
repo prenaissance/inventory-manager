@@ -13,9 +13,9 @@ export const DragOverPagination = ({ direction, ...props }: Props) => {
   const setPage = (page: number) => setSearchParams({ page: String(page + 1) });
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const handleDragEnter = () => {
+  const handleDragOver = () => {
     if (timerRef.current) {
-      clearTimeout(timerRef.current);
+      return;
     }
     timerRef.current = setTimeout(() => {
       if (direction === "forward") {
@@ -24,20 +24,18 @@ export const DragOverPagination = ({ direction, ...props }: Props) => {
       if (direction === "backward") {
         setPage(Math.max(0, page - 1));
       }
+      timerRef.current = null;
     }, 500);
   };
 
   const handleDragLeave = () => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
+      timerRef.current = null;
     }
   };
 
   return (
-    <Box
-      onDragEnter={handleDragEnter}
-      onDragLeave={handleDragLeave}
-      {...props}
-    />
+    <Box onDragOver={handleDragOver} onDragLeave={handleDragLeave} {...props} />
   );
 };

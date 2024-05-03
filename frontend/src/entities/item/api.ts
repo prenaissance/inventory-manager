@@ -18,3 +18,14 @@ export const addItem = ({ templateId }: { templateId: string }) =>
   api
     .post<Item>("/inventory", { templateId })
     .then((response) => response.data);
+
+export const swapItems = ({
+  fromOrder,
+  toOrder,
+}: {
+  fromOrder: number;
+  toOrder: number;
+}) =>
+  api
+    .put<{ message?: string }>("/inventory/swap", { fromOrder, toOrder })
+    .then((response) => response.data);

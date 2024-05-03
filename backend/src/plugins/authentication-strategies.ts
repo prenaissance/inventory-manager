@@ -15,9 +15,9 @@ declare module "fastify" {
 }
 
 const authenticationStrategies = fastifyPlugin(async (app) => {
-  app.decorate("verifyAuthenticated", (request, reply, done) => {
+  app.decorate("verifyAuthenticated", async (request, reply, done) => {
     if (!request.headers.authorization) {
-      return reply.code(401).send({
+      return await reply.code(401).send({
         message: "Unauthorized",
       });
     }
@@ -25,7 +25,7 @@ const authenticationStrategies = fastifyPlugin(async (app) => {
       request.headers.authorization.replace("Bearer ", ""),
     );
     if (!data) {
-      return reply.code(401).send({
+      return await reply.code(401).send({
         message: "Unauthorized",
       });
     }
@@ -41,7 +41,7 @@ const authenticationStrategies = fastifyPlugin(async (app) => {
   app.decorate("verifyPermissions", (permissions: Permission[]) => {
     return async (request, reply, done) => {
       if (!request.headers.authorization) {
-        return reply.code(401).send({
+        return await reply.code(401).send({
           message: "Unauthorized",
         });
       }
@@ -49,7 +49,7 @@ const authenticationStrategies = fastifyPlugin(async (app) => {
         request.headers.authorization.replace("Bearer ", ""),
       );
       if (!data) {
-        return reply.code(401).send({
+        return await reply.code(401).send({
           message: "Unauthorized",
         });
       }
@@ -59,7 +59,7 @@ const authenticationStrategies = fastifyPlugin(async (app) => {
           data.permissions.includes(permission),
         )
       ) {
-        return reply.code(403).send({
+        return await reply.code(403).send({
           message: "Forbidden",
         });
       }

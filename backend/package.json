@@ -6,6 +6,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "tsx src/app.ts | pino-pretty",
     "dev": "tsx watch src/app.ts | pino-pretty",
     "build": "esbuild $(find src -name '*.ts') --platform=node --outdir=dist --sourcemap && tsc-alias ",
     "seed": "tsx scripts/seed.ts",

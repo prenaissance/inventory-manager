@@ -21,7 +21,7 @@ const app = Fastify({
 }).withTypeProvider<TypeBoxTypeProvider>();
 
 app.register(corsPlugin, {
-  origin: "https://prenaissance.github.io/inventory-manager/",
+  origin: "https://prenaissance.github.io",
   credentials: true,
 });
 

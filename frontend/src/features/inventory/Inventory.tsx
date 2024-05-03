@@ -6,11 +6,12 @@ import {
   HStack,
   Image,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 
 import parodyLogo from "@/assets/parody-logo.png";
 import { InventorySearchBar } from "./InventorySearchBar";
-import { fetchItems } from "@/entities/item/api";
+import { fetchItems, swapItems } from "@/entities/item/api";
 import { DragEvent, useState } from "react";
 import { ItemSlot } from "@/entities/item/ui/ItemSlot";
 import { EmptyItemSlot } from "@/entities/item/ui/EmptyItemSlot";
@@ -20,7 +21,7 @@ import { AddItemFormButton } from "./AddItemFormButton";
 import { InventoryPagination } from "./InventoryPagination";
 import { useSearchParams } from "react-router-dom";
 import { DragOverPagination } from "./DragOverPagination";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LoadingItemSplot } from "@/entities/item/ui/LoadingItemSlot";
 
 export type InventoryProps = BoxProps;
@@ -34,12 +35,32 @@ export const Inventory = (props: InventoryProps) => {
   const [_selectedItem, setSelectedItem] = useState<Item | undefined>(
     undefined,
   );
+  const toast = useToast();
   const minOrder = 0 + page * ITEMS_PER_PAGE;
 
+  const queryClient = useQueryClient();
   const { isLoading, data } = useQuery({
     queryKey: ["items", { page }],
     queryFn: () => fetchItems(page + 1),
     enabled: !searchParams.has("search"),
+  });
+
+  const swapItemsMutation = useMutation({
+    mutationFn: swapItems,
+    onError: (error) => {
+      toast({
+        title: "Error swapping items",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["items"],
+      });
+    },
   });
 
   const selectedItem = _selectedItem ?? data?.[0];
@@ -62,6 +83,10 @@ export const Inventory = (props: InventoryProps) => {
     if (item.order === order) {
       return;
     }
+    swapItemsMutation.mutate({
+      fromOrder: item.order,
+      toOrder: order,
+    });
   };
 
   return (
@@ -115,17 +140,17 @@ export const Inventory = (props: InventoryProps) => {
             direction="backward"
             position="absolute"
             top="0"
-            left="0"
+            left="-5%"
             h="full"
-            w="10%"
+            w="15%"
           />
           <DragOverPagination
             direction="forward"
             position="absolute"
             top="0"
-            right="0"
+            right="5%"
             h="full"
-            w="10%"
+            w="15%"
           />
           {isLoading
             ? new Array(ITEMS_PER_PAGE)
